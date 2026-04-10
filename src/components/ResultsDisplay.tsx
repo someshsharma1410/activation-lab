@@ -39,19 +39,8 @@ export default function ResultsDisplay({ result, flowText }: ResultsDisplayProps
           >
             Top Recommendation
           </p>
-          <p style={{ margin: '0 0 10px', fontSize: 14, color: '#1a1a2e', lineHeight: 1.55 }}>
+          <p style={{ margin: 0, fontSize: 14, color: '#1a1a2e', lineHeight: 1.55 }}>
             {summary.top_recommendation}
-          </p>
-          <p
-            style={{
-              margin: 0,
-              fontSize: 12,
-              color: '#5a5a7a',
-              lineHeight: 1.55,
-              fontStyle: 'italic',
-            }}
-          >
-            {summary.sequence_rationale}
           </p>
         </div>
 
@@ -91,6 +80,18 @@ export default function ResultsDisplay({ result, flowText }: ResultsDisplayProps
           </p>
         </div>
       </div>
+
+      {/* Ranking logic explainer */}
+      <p
+        style={{
+          fontSize: 11,
+          color: '#5a5a7a',
+          margin: '0 0 12px',
+          paddingLeft: 2,
+        }}
+      >
+        Ranked by Impact × Confidence, then Effort. High impact, high confidence, low effort goes first.
+      </p>
 
       {/* Cards */}
       {friction_points.map((point) => (

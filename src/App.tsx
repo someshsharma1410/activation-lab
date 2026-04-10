@@ -4,18 +4,20 @@ import ResultsDisplay from './components/ResultsDisplay'
 import { analyzeFlow } from './lib/api'
 import type { AnalysisResult } from './types/analysis'
 
+// Exact neutral descriptions from v2 spec Section 3.2.1
+// These are written to be friction-neutral so the tool does the identifying, not the example
 const EXAMPLE_FLOWS = [
   {
-    label: 'SaaS with credit card wall',
-    text: 'User lands on the marketing page and clicks Start Free Trial. Goes to a signup form requiring email, password, full name, company name, job title, team size, and a credit card even for the free trial. After signup, lands on an empty dashboard with a tooltip tour. The first useful action requires creating a project and inviting a teammate before seeing any value.',
+    label: 'SaaS signup',
+    text: 'User lands on pricing page, clicks Start Free Trial, enters email and password, fills out a 6 field profile form including company size and role, selects a plan, enters credit card details, lands on empty dashboard.',
   },
   {
-    label: 'Mobile app permissions wall',
-    text: 'User downloads the app and sees a welcome screen with three value props. Then immediately asked to allow notifications, then allow location access, then allow contacts. After permissions, asked to create an account with email and password. Then prompted to complete a profile with photo, bio, and interests before seeing any content.',
+    label: 'Mobile app',
+    text: 'New user downloads the app, sees a welcome screen, taps Get Started, is asked to grant location and notification permissions, creates an account with email and password, is shown a 4 screen tutorial, lands on the home feed.',
   },
   {
-    label: 'Marketplace seller onboarding',
-    text: 'Seller signs up with email and must verify before proceeding. Then must complete a full profile including payment info, tax ID, and business address before listing a first item. The product listing form has 24 required fields. First listing requires manual approval which takes 48 to 72 hours. Seller gets no indication of where they are in the process.',
+    label: 'Marketplace',
+    text: 'User lands on homepage, browses listings, clicks Contact Seller, is prompted to create an account, enters email and password, completes a profile with photo upload and bio, verifies phone number, can now message seller.',
   },
 ]
 
@@ -56,7 +58,7 @@ export default function App() {
         }}
       >
         {/* Hero */}
-        <div style={{ marginBottom: 36 }}>
+        <div style={{ marginBottom: 32 }}>
           <p
             style={{
               fontSize: 11,
@@ -76,7 +78,7 @@ export default function App() {
               fontWeight: 400,
               lineHeight: 1.08,
               color: '#1a1a2e',
-              margin: '0 0 18px',
+              margin: '0 0 16px',
               letterSpacing: '-0.01em',
             }}
           >
@@ -88,15 +90,35 @@ export default function App() {
               fontWeight: 300,
               color: '#5a5a7a',
               lineHeight: 1.65,
-              margin: '0 0 28px',
+              margin: '0 0 32px',
               maxWidth: 520,
             }}
           >
-            Describe any onboarding flow. Get ranked A/B test hypotheses grounded in real PM
-            frameworks.
+            Paste an onboarding flow. Get experiment ideas backed by proven product frameworks.
           </p>
+        </div>
 
-          {/* Example chips */}
+        {/* Example chips — visually separated from the input area */}
+        <div
+          style={{
+            background: '#eeecea',
+            borderRadius: 10,
+            padding: '14px 18px',
+            marginBottom: 12,
+          }}
+        >
+          <p
+            style={{
+              margin: '0 0 10px',
+              fontSize: 11,
+              fontWeight: 600,
+              color: '#5a5a7a',
+              textTransform: 'uppercase',
+              letterSpacing: '0.09em',
+            }}
+          >
+            New here? Try an example:
+          </p>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {EXAMPLE_FLOWS.map((flow) => (
               <button
@@ -106,13 +128,16 @@ export default function App() {
                   background: '#ffffff',
                   border: '1px solid rgba(0,0,0,0.08)',
                   borderRadius: 20,
-                  padding: '6px 15px',
-                  fontSize: 13,
+                  padding: '5px 12px',
+                  fontSize: 12,
                   fontWeight: 500,
                   color: '#1a1a2e',
                   cursor: 'pointer',
                   fontFamily: 'inherit',
-                  transition: 'border-color 0.15s, background 0.15s',
+                  transition: 'border-color 0.15s, background 0.15s, color 0.15s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.borderColor = '#1a6ff0'
@@ -125,6 +150,20 @@ export default function App() {
                   e.currentTarget.style.color = '#1a1a2e'
                 }}
               >
+                <span
+                  style={{
+                    fontSize: 9,
+                    fontWeight: 700,
+                    letterSpacing: '0.06em',
+                    textTransform: 'uppercase',
+                    color: '#5a5a7a',
+                    background: 'rgba(0,0,0,0.06)',
+                    borderRadius: 3,
+                    padding: '1px 5px',
+                  }}
+                >
+                  eg
+                </span>
                 {flow.label}
               </button>
             ))}

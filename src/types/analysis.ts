@@ -1,5 +1,6 @@
 export type Severity = 'high' | 'medium' | 'low'
 export type Confidence = 'high' | 'medium' | 'low'
+export type Effort = 'low' | 'medium' | 'high'
 export type Framework = 'TTV' | 'Funnel' | 'Aha' | 'CogLoad' | 'Skippable'
 
 export interface ExpectedLift {
@@ -18,6 +19,7 @@ export interface FrictionPoint {
   lift_context: string
   confidence: Confidence
   severity: Severity
+  effort: Effort
   framework: Framework
   risk: string
   sequence_order: number
@@ -27,7 +29,6 @@ export interface AnalysisSummary {
   total_friction_points: number
   top_recommendation: string
   average_expected_lift: number
-  sequence_rationale: string
 }
 
 export interface AnalysisResult {

@@ -29,7 +29,7 @@ function buildMarkdown(result: AnalysisResult, flowText: string): string {
     lines.push(`### ${i + 1}. ${p.title}`)
     lines.push('')
     lines.push(
-      `**Severity:** ${p.severity} | **Framework:** ${p.framework} | **Confidence:** ${p.confidence}`,
+      `**Impact:** ${p.severity} | **Effort:** ${p.effort} | **Confidence:** ${p.confidence} | **Framework:** ${p.framework}`,
     )
     lines.push('')
     lines.push(p.description)
