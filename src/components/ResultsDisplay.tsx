@@ -2,13 +2,15 @@ import { useState } from 'react'
 import type { AnalysisResult } from '../types/analysis'
 import FrictionCard from './FrictionCard'
 import ExportButton from './ExportButton'
+import FollowUpChat from './FollowUpChat'
 
 interface ResultsDisplayProps {
   result: AnalysisResult
   flowText: string
+  activationMetric?: string
 }
 
-export default function ResultsDisplay({ result, flowText }: ResultsDisplayProps) {
+export default function ResultsDisplay({ result, flowText, activationMetric }: ResultsDisplayProps) {
   const { summary, friction_points } = result
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
   const allExpanded = expandedIds.size === friction_points.length
@@ -149,6 +151,22 @@ export default function ResultsDisplay({ result, flowText }: ResultsDisplayProps
       <div style={{ marginTop: 16 }}>
         <ExportButton result={result} flowText={flowText} />
       </div>
+
+      {/* Divider */}
+      <div
+        style={{
+          borderTop: '1px solid rgba(0,0,0,0.07)',
+          marginTop: 40,
+        }}
+      />
+
+      {/* Follow up chat */}
+      <FollowUpChat
+        result={result}
+        flowDescription={activationMetric
+          ? `My activation metric is: ${activationMetric}. Flow: ${flowText}`
+          : flowText}
+      />
     </div>
   )
 }

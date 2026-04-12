@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { AnalysisResult } from '../types/analysis'
+import { exportToPDF } from '../lib/pdf-export'
 
 interface ExportButtonProps {
   result: AnalysisResult
@@ -49,6 +50,7 @@ function buildMarkdown(result: AnalysisResult, flowText: string): string {
 
 export default function ExportButton({ result, flowText }: ExportButtonProps) {
   const [copied, setCopied] = useState(false)
+  const [pdfLoading, setPdfLoading] = useState(false)
 
   async function handleCopy() {
     const md = buildMarkdown(result, flowText)
@@ -57,27 +59,60 @@ export default function ExportButton({ result, flowText }: ExportButtonProps) {
     setTimeout(() => setCopied(false), 2200)
   }
 
+  function handlePDF() {
+    setPdfLoading(true)
+    try {
+      exportToPDF(result, flowText)
+    } finally {
+      setTimeout(() => setPdfLoading(false), 800)
+    }
+  }
+
   return (
-    <button
-      onClick={handleCopy}
-      style={{
-        background: 'transparent',
-        border: '1px solid rgba(0,0,0,0.12)',
-        borderRadius: 8,
-        padding: '8px 16px',
-        fontSize: 13,
-        fontWeight: 500,
-        color: copied ? '#28a050' : '#5a5a7a',
-        cursor: 'pointer',
-        fontFamily: 'inherit',
-        transition: 'color 0.2s, border-color 0.2s',
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 7,
-        borderColor: copied ? 'rgba(40,160,80,0.3)' : 'rgba(0,0,0,0.12)',
-      }}
-    >
-      {copied ? '✓ Copied to clipboard' : 'Copy as markdown'}
-    </button>
+    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+      <button
+        onClick={handleCopy}
+        style={{
+          background: 'transparent',
+          border: '1px solid rgba(0,0,0,0.12)',
+          borderRadius: 8,
+          padding: '8px 16px',
+          fontSize: 13,
+          fontWeight: 500,
+          color: copied ? '#28a050' : '#5a5a7a',
+          cursor: 'pointer',
+          fontFamily: 'inherit',
+          transition: 'color 0.2s, border-color 0.2s',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 7,
+          borderColor: copied ? 'rgba(40,160,80,0.3)' : 'rgba(0,0,0,0.12)',
+        }}
+      >
+        {copied ? '✓ Copied to clipboard' : 'Copy as markdown'}
+      </button>
+
+      <button
+        onClick={handlePDF}
+        disabled={pdfLoading}
+        style={{
+          background: pdfLoading ? 'rgba(0,0,0,0.06)' : '#1a6ff0',
+          border: 'none',
+          borderRadius: 8,
+          padding: '8px 16px',
+          fontSize: 13,
+          fontWeight: 500,
+          color: pdfLoading ? '#5a5a7a' : '#ffffff',
+          cursor: pdfLoading ? 'not-allowed' : 'pointer',
+          fontFamily: 'inherit',
+          transition: 'background 0.15s',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 7,
+        }}
+      >
+        {pdfLoading ? 'Generating...' : 'Export brief'}
+      </button>
+    </div>
   )
 }
