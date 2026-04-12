@@ -1,12 +1,19 @@
 import type { AnalysisResult } from '../types/analysis'
 import { SYSTEM_PROMPT } from './prompts'
 
-export async function analyzeFlow(flowDescription: string): Promise<AnalysisResult> {
+export async function analyzeFlow(
+  flowDescription: string,
+  activationMetric?: string,
+): Promise<AnalysisResult> {
   const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY as string
 
   const url = import.meta.env.DEV
     ? '/api/analyze'
     : 'https://api.anthropic.com/v1/messages'
+
+  const userMessage = activationMetric
+    ? `My activation metric is: ${activationMetric}. With that in mind, analyze this flow:\n\n${flowDescription}`
+    : flowDescription
 
   const response = await fetch(url, {
     method: 'POST',
@@ -18,9 +25,9 @@ export async function analyzeFlow(flowDescription: string): Promise<AnalysisResu
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 1500,
+      max_tokens: 2000,
       system: SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: flowDescription }],
+      messages: [{ role: 'user', content: userMessage }],
     }),
   })
 

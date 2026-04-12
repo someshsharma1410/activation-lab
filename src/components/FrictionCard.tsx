@@ -96,9 +96,11 @@ function ScoreChip({ label, color, bg }: { label: string; color: string; bg: str
 
 interface FrictionCardProps {
   point: FrictionPoint
+  expanded: boolean
+  onToggle: () => void
 }
 
-export default function FrictionCard({ point }: FrictionCardProps) {
+export default function FrictionCard({ point, expanded, onToggle }: FrictionCardProps) {
   const s = SEVERITY_STYLES[point.severity]
   const impact = IMPACT_SCORE[point.severity]
   const effort = EFFORT_SCORE[point.effort]
@@ -111,146 +113,195 @@ export default function FrictionCard({ point }: FrictionCardProps) {
         border: `1px solid ${s.border}`,
         borderTop: `3px solid ${s.topBorder}`,
         borderRadius: 10,
-        padding: '20px 22px',
         marginBottom: 12,
+        overflow: 'hidden',
       }}
     >
-      {/* Title row */}
+      {/* Always-visible header — click to toggle */}
       <div
+        onClick={onToggle}
         style={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-          gap: 12,
-          marginBottom: 10,
+          padding: '18px 22px 14px',
+          cursor: 'pointer',
+          userSelect: 'none' as const,
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 9, minWidth: 0 }}>
+        {/* Title row */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            gap: 12,
+            marginBottom: 10,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 9, minWidth: 0 }}>
+            <div
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                background: s.dot,
+                flexShrink: 0,
+                marginTop: 2,
+              }}
+            />
+            <h3
+              style={{
+                margin: 0,
+                fontSize: 15,
+                fontWeight: 600,
+                color: '#1a1a2e',
+                lineHeight: 1.3,
+              }}
+            >
+              {point.title}
+            </h3>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, flexWrap: 'wrap' as const, justifyContent: 'flex-end' }}>
+            <Tag color="#6c47d4" bg="rgba(108,71,212,0.09)">
+              {FRAMEWORK_LABELS[point.framework]}
+            </Tag>
+            <Tag color="#5a5a7a" bg="rgba(0,0,0,0.06)">
+              {SEQUENCE_LABELS[point.sequence_order] ?? `Run #${point.sequence_order}`}
+            </Tag>
+            {/* Expand/collapse chevron */}
+            <span
+              style={{
+                fontSize: 12,
+                color: '#5a5a7a',
+                marginLeft: 2,
+                display: 'inline-block',
+                transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                transition: 'transform 0.2s',
+                lineHeight: 1,
+              }}
+            >
+              ▾
+            </span>
+          </div>
+        </div>
+
+        {/* Score chips — always visible */}
+        <div
+          style={{
+            display: 'flex',
+            gap: 6,
+            marginBottom: 10,
+            paddingLeft: 17,
+            flexWrap: 'wrap' as const,
+          }}
+        >
+          <ScoreChip label={impact.label} color={impact.color} bg={impact.bg} />
+          <ScoreChip label={effort.label} color={effort.color} bg={effort.bg} />
+          <ScoreChip label={confidence.label} color={confidence.color} bg={confidence.bg} />
+        </div>
+
+        {/* Summary — always visible */}
+        <p
+          style={{
+            margin: 0,
+            fontSize: 13,
+            color: '#5a5a7a',
+            lineHeight: 1.55,
+            paddingLeft: 17,
+          }}
+        >
+          {point.summary}
+        </p>
+      </div>
+
+      {/* Expandable detail section */}
+      {expanded && (
+        <div style={{ padding: '0 22px 20px' }}>
           <div
             style={{
-              width: 8,
-              height: 8,
-              borderRadius: '50%',
-              background: s.dot,
-              flexShrink: 0,
-              marginTop: 1,
-            }}
-          />
-          <h3
-            style={{
-              margin: 0,
-              fontSize: 15,
-              fontWeight: 600,
-              color: '#1a1a2e',
-              lineHeight: 1.3,
+              borderTop: `1px solid ${s.border}`,
+              paddingTop: 16,
             }}
           >
-            {point.title}
-          </h3>
+            {/* Description */}
+            <p
+              style={{
+                margin: '0 0 12px',
+                fontSize: 14,
+                color: '#5a5a7a',
+                lineHeight: 1.65,
+                paddingLeft: 17,
+              }}
+            >
+              {point.description}
+            </p>
+
+            {/* Hypothesis */}
+            <div
+              style={{
+                background: 'rgba(108,71,212,0.06)',
+                border: '1px solid rgba(108,71,212,0.13)',
+                borderRadius: 7,
+                padding: '10px 14px',
+                marginBottom: 8,
+              }}
+            >
+              <p style={{ margin: 0, fontSize: 13, color: '#3d2a8a', lineHeight: 1.6 }}>
+                <strong style={{ fontWeight: 600 }}>Hypothesis </strong>
+                {point.hypothesis}
+              </p>
+            </div>
+
+            {/* Recommended test */}
+            <div
+              style={{
+                background: 'rgba(26,111,240,0.06)',
+                border: '1px solid rgba(26,111,240,0.13)',
+                borderRadius: 7,
+                padding: '10px 14px',
+                marginBottom: 8,
+              }}
+            >
+              <p style={{ margin: 0, fontSize: 13, color: '#0f3d99', lineHeight: 1.6 }}>
+                <strong style={{ fontWeight: 600 }}>Test </strong>
+                {point.recommended_test}
+              </p>
+            </div>
+
+            {/* Risk */}
+            <div
+              style={{
+                background: 'rgba(200,50,50,0.05)',
+                border: '1px solid rgba(200,50,50,0.13)',
+                borderRadius: 7,
+                padding: '10px 14px',
+                marginBottom: 14,
+              }}
+            >
+              <p style={{ margin: 0, fontSize: 13, color: '#8b2020', lineHeight: 1.6 }}>
+                <strong style={{ fontWeight: 600 }}>Watch out for </strong>
+                {point.risk}
+              </p>
+            </div>
+
+            {/* Lift */}
+            <div style={{ paddingLeft: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 4 }}>
+                <span style={{ fontSize: 12, color: '#5a5a7a' }}>
+                  Expected lift:{' '}
+                  <strong style={{ color: '#1a1a2e', fontWeight: 600 }}>
+                    {point.expected_lift.low}% to {point.expected_lift.high}%
+                  </strong>
+                </span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: '#28a050' }}>
+                  ~{point.expected_lift.mid}% mid estimate
+                </span>
+              </div>
+              <p style={{ margin: 0, fontSize: 11, color: '#5a5a7a', fontStyle: 'italic' }}>
+                {point.lift_context}
+              </p>
+            </div>
+          </div>
         </div>
-        <div style={{ display: 'flex', gap: 6, flexShrink: 0, flexWrap: 'wrap' as const, justifyContent: 'flex-end' }}>
-          <Tag color="#6c47d4" bg="rgba(108,71,212,0.09)">
-            {FRAMEWORK_LABELS[point.framework]}
-          </Tag>
-          <Tag color="#5a5a7a" bg="rgba(0,0,0,0.06)">
-            {SEQUENCE_LABELS[point.sequence_order] ?? `Run #${point.sequence_order}`}
-          </Tag>
-        </div>
-      </div>
-
-      {/* Scoring breakdown — Impact × Confidence, Effort tiebreaker */}
-      <div
-        style={{
-          display: 'flex',
-          gap: 6,
-          marginBottom: 12,
-          paddingLeft: 17,
-          flexWrap: 'wrap' as const,
-        }}
-      >
-        <ScoreChip label={impact.label} color={impact.color} bg={impact.bg} />
-        <ScoreChip label={effort.label} color={effort.color} bg={effort.bg} />
-        <ScoreChip label={confidence.label} color={confidence.color} bg={confidence.bg} />
-      </div>
-
-      {/* Description */}
-      <p
-        style={{
-          margin: '0 0 12px',
-          fontSize: 14,
-          color: '#5a5a7a',
-          lineHeight: 1.65,
-          paddingLeft: 17,
-        }}
-      >
-        {point.description}
-      </p>
-
-      {/* Hypothesis */}
-      <div
-        style={{
-          background: 'rgba(108,71,212,0.06)',
-          border: '1px solid rgba(108,71,212,0.13)',
-          borderRadius: 7,
-          padding: '10px 14px',
-          marginBottom: 8,
-        }}
-      >
-        <p style={{ margin: 0, fontSize: 13, color: '#3d2a8a', lineHeight: 1.6 }}>
-          <strong style={{ fontWeight: 600 }}>Hypothesis </strong>
-          {point.hypothesis}
-        </p>
-      </div>
-
-      {/* Recommended test */}
-      <div
-        style={{
-          background: 'rgba(26,111,240,0.06)',
-          border: '1px solid rgba(26,111,240,0.13)',
-          borderRadius: 7,
-          padding: '10px 14px',
-          marginBottom: 8,
-        }}
-      >
-        <p style={{ margin: 0, fontSize: 13, color: '#0f3d99', lineHeight: 1.6 }}>
-          <strong style={{ fontWeight: 600 }}>Test </strong>
-          {point.recommended_test}
-        </p>
-      </div>
-
-      {/* Risk */}
-      <div
-        style={{
-          background: 'rgba(200,50,50,0.05)',
-          border: '1px solid rgba(200,50,50,0.13)',
-          borderRadius: 7,
-          padding: '10px 14px',
-          marginBottom: 14,
-        }}
-      >
-        <p style={{ margin: 0, fontSize: 13, color: '#8b2020', lineHeight: 1.6 }}>
-          <strong style={{ fontWeight: 600 }}>Watch out for </strong>
-          {point.risk}
-        </p>
-      </div>
-
-      {/* Lift */}
-      <div style={{ paddingLeft: 1 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 4 }}>
-          <span style={{ fontSize: 12, color: '#5a5a7a' }}>
-            Expected lift:{' '}
-            <strong style={{ color: '#1a1a2e', fontWeight: 600 }}>
-              {point.expected_lift.low}% to {point.expected_lift.high}%
-            </strong>
-          </span>
-          <span style={{ fontSize: 13, fontWeight: 600, color: '#28a050' }}>
-            ~{point.expected_lift.mid}% mid estimate
-          </span>
-        </div>
-        <p style={{ margin: 0, fontSize: 11, color: '#5a5a7a', fontStyle: 'italic' }}>
-          {point.lift_context}
-        </p>
-      </div>
+      )}
     </div>
   )
 }

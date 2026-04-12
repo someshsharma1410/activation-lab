@@ -5,7 +5,6 @@ import { analyzeFlow } from './lib/api'
 import type { AnalysisResult } from './types/analysis'
 
 // Exact neutral descriptions from v2 spec Section 3.2.1
-// These are written to be friction-neutral so the tool does the identifying, not the example
 const EXAMPLE_FLOWS = [
   {
     label: 'SaaS signup',
@@ -23,6 +22,7 @@ const EXAMPLE_FLOWS = [
 
 export default function App() {
   const [flowText, setFlowText] = useState('')
+  const [activationMetric, setActivationMetric] = useState('')
   const [result, setResult] = useState<AnalysisResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -32,7 +32,7 @@ export default function App() {
     setError(null)
     setResult(null)
     try {
-      const data = await analyzeFlow(flowText)
+      const data = await analyzeFlow(flowText, activationMetric.trim() || undefined)
       setResult(data)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong')
@@ -96,6 +96,48 @@ export default function App() {
           >
             Paste an onboarding flow. Get experiment ideas backed by proven product frameworks.
           </p>
+        </div>
+
+        {/* Activation metric — optional context field */}
+        <div style={{ marginBottom: 12 }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: 11,
+              fontWeight: 600,
+              color: '#5a5a7a',
+              textTransform: 'uppercase',
+              letterSpacing: '0.09em',
+              marginBottom: 7,
+            }}
+          >
+            What does activation mean for your product?{' '}
+            <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0, opacity: 0.7 }}>
+              optional
+            </span>
+          </label>
+          <input
+            type="text"
+            value={activationMetric}
+            onChange={(e) => setActivationMetric(e.target.value)}
+            placeholder="e.g. first project created, day 1 retention, first purchase"
+            style={{
+              width: '100%',
+              padding: '11px 16px',
+              background: '#ffffff',
+              border: '1px solid rgba(0,0,0,0.08)',
+              borderRadius: 8,
+              fontSize: 14,
+              fontWeight: 400,
+              color: '#1a1a2e',
+              fontFamily: 'inherit',
+              outline: 'none',
+              boxSizing: 'border-box',
+              transition: 'border-color 0.15s',
+            }}
+            onFocus={(e) => { e.currentTarget.style.borderColor = 'rgba(26,111,240,0.3)' }}
+            onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.08)' }}
+          />
         </div>
 
         {/* Example chips — visually separated from the input area */}

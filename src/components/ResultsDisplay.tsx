@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { AnalysisResult } from '../types/analysis'
 import FrictionCard from './FrictionCard'
 import ExportButton from './ExportButton'
@@ -9,6 +10,25 @@ interface ResultsDisplayProps {
 
 export default function ResultsDisplay({ result, flowText }: ResultsDisplayProps) {
   const { summary, friction_points } = result
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
+  const allExpanded = expandedIds.size === friction_points.length
+
+  function toggleCard(id: string) {
+    setExpandedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  function toggleAll() {
+    if (allExpanded) {
+      setExpandedIds(new Set())
+    } else {
+      setExpandedIds(new Set(friction_points.map((p) => p.id)))
+    }
+  }
 
   return (
     <div style={{ marginTop: 40 }}>
@@ -81,21 +101,48 @@ export default function ResultsDisplay({ result, flowText }: ResultsDisplayProps
         </div>
       </div>
 
-      {/* Ranking logic explainer */}
-      <p
+      {/* Ranking explainer + expand all toggle */}
+      <div
         style={{
-          fontSize: 11,
-          color: '#5a5a7a',
-          margin: '0 0 12px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 12,
           paddingLeft: 2,
         }}
       >
-        Ranked by Impact × Confidence, then Effort. High impact, high confidence, low effort goes first.
-      </p>
+        <p style={{ fontSize: 11, color: '#5a5a7a', margin: 0 }}>
+          Ranked by Impact × Confidence, then Effort. High impact, high confidence, low effort goes first.
+        </p>
+        <button
+          onClick={toggleAll}
+          style={{
+            background: 'transparent',
+            border: '1px solid rgba(0,0,0,0.10)',
+            borderRadius: 6,
+            padding: '4px 12px',
+            fontSize: 12,
+            fontWeight: 500,
+            color: '#5a5a7a',
+            cursor: 'pointer',
+            fontFamily: 'inherit',
+            whiteSpace: 'nowrap' as const,
+            flexShrink: 0,
+            marginLeft: 16,
+          }}
+        >
+          {allExpanded ? 'Collapse all' : 'Show all details'}
+        </button>
+      </div>
 
       {/* Cards */}
       {friction_points.map((point) => (
-        <FrictionCard key={point.id} point={point} />
+        <FrictionCard
+          key={point.id}
+          point={point}
+          expanded={expandedIds.has(point.id)}
+          onToggle={() => toggleCard(point.id)}
+        />
       ))}
 
       {/* Export */}

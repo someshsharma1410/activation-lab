@@ -12,6 +12,7 @@ export interface ExpectedLift {
 export interface FrictionPoint {
   id: string
   title: string
+  summary: string
   description: string
   hypothesis: string
   recommended_test: string
