@@ -255,7 +255,13 @@ export default function App() {
         )}
 
         {/* Results */}
-        {result && !loading && <ResultsDisplay result={result} flowText={flowText} />}
+        {result && !loading && (
+          <ResultsDisplay
+            result={result}
+            flowText={flowText}
+            activationMetric={activationMetric.trim() || undefined}
+          />
+        )}
 
         {/* Footer */}
         <p
