@@ -14,13 +14,17 @@ I wanted a tool that could think through the tradeoffs with me instead of just l
 
 ## What it does
 
-You describe any onboarding or activation flow in plain English. The tool returns:
+You describe any onboarding or activation flow in plain English, optionally tell the tool what activation means for your product, and get back:
 
-- **3 to 5 ranked friction points** with severity scoring
-- **A test hypothesis for each**, grounded in activation frameworks (Time to Value, Funnel Drop-off, Cognitive Load, Aha Moment)
+- **3 to 5 ranked friction points** with severity, confidence, and effort scoring
+- **A test hypothesis for each**, grounded in activation frameworks: Time to Value, Funnel Drop-off, Aha Moment, Cognitive Load, or Skippable vs Required steps
 - **Run order sequencing** with rationale for why one test should go before another
 - **A "watch out for" risk line** per test — the second-order consequence you need to think about before running it
 - **Expected lift range** benchmarked against comparable experiments
+- **Progressive disclosure UI** — collapsed cards for scanning, expand any card for the full experiment spec
+- **Follow-up chat** — ask questions about the analysis with the full context preserved
+- **Export options** — one-page PDF brief for async sharing, or copy as markdown
+- **Input scope validation** — soft warning when the input doesn't look like a product onboarding flow
 
 ## The insight that shaped the design
 
@@ -38,17 +42,24 @@ These are the calls I made as the PM on this, and why:
 
 - **Why "Run first / second / third" instead of a priority score.** A numeric score invites debate. A run order forces commitment.
 
-- **Why every card shows a "watch out for" line.** PMs stop reading when a tool only tells them what to do. Showing what could go wrong signals that the tool has done the second-order thinking for them. It reads as a thinking partner instead of a generator.
+- **Why every card shows a "watch out for" line.** PMs stop reading when a tool only tells them what to do. Showing what could go wrong signals the tool has done the second-order thinking for them. It reads as a thinking partner instead of a generator.
+
+- **Why progressive disclosure on the cards.** A PM shouldn't have to read five full specs to decide which friction point to focus on. The collapsed view shows rank, framework, and a one-line summary. Expand only the ones worth the deeper read.
+
+- **Why follow-up chat with the full analysis in context.** The analysis is the start of a conversation, not the end of one. PMs need to pressure-test the reasoning — "why this order?" "what tool should I use?" — without losing the original frame.
 
 - **Why no user accounts or saved history.** Scope discipline. Activation Lab is a thinking partner for a single session, not a CRM. Saved history is a different product.
 
-- **Why Time to Value, Funnel Drop-off, Cognitive Load, and Aha Moment as the core frameworks.** They cover the four failure modes that account for most activation friction I've seen in the wild. Adding more frameworks would sound comprehensive but dilute the output.
+- **Why these five frameworks and no more.** Time to Value, Funnel Drop-off, Aha Moment, Cognitive Load, and Skippable vs Required steps cover the failure modes that account for most activation friction I've seen in the wild. Adding more would sound comprehensive but dilute the output.
+
+- **Why input validation is a soft warning, not a hard block.** A B2B sales process isn't the target use case, but I'm not the arbiter of what a user wants to analyze. The tool warns and lets them proceed.
 
 ## Built with
 
-- **Claude Code + Anthropic API** for the reasoning engine
-- **Lovable** for the initial UI scaffolding
+- **Anthropic Claude Sonnet 4** as the reasoning engine, accessed via the Claude API
+- **Claude Code** as the development environment
 - **React + TypeScript + Vite** for the frontend
+- **jsPDF** for client-side PDF export
 - **Vercel** for hosting
 
 ## About
