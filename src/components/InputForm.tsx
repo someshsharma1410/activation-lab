@@ -3,20 +3,30 @@ import { useState } from 'react'
 const SOFT_WARN_THRESHOLD = 50
 const SCOPE_CHECK_THRESHOLD = 80
 
-// Signals that suggest a digital product onboarding flow
+// Signals that suggest a digital product onboarding flow.
+// Keep these specific enough to avoid false positives on B2B/business process text.
 const DIGITAL_SIGNALS = [
-  'app', 'website', 'web', 'mobile', 'desktop', 'browser',
-  'signup', 'sign up', 'sign-up', 'register', 'login', 'log in', 'log-in',
-  'dashboard', 'screen', 'page', 'modal', 'button', 'click', 'tap', 'swipe',
-  'download', 'install', 'launch',
-  'account', 'profile', 'email', 'password', 'username',
-  'form', 'field', 'input', 'checkbox', 'dropdown',
-  'onboard', 'onboarding', 'tutorial', 'walkthrough', 'tour',
-  'notification', 'permission', 'pop-up', 'popup', 'toast',
-  'saas', 'b2c', 'freemium', 'trial', 'free trial', 'subscription',
-  'user lands', 'user clicks', 'user taps', 'user sees', 'user enters',
-  'user is', 'user opens', 'user downloads',
-  'api key', 'oauth', 'sso', 'integration', 'sdk', 'snippet',
+  // Product surface
+  'app', 'website', 'web app', 'mobile app', 'desktop app', 'browser extension',
+  // Auth & identity
+  'signup', 'sign up', 'sign-up', 'sign up for', 'register', 'create an account',
+  'log in', 'login', 'log-in', 'password', 'username', 'email address',
+  // Navigation & UI
+  'dashboard', 'modal', 'button', 'click', 'tap', 'swipe', 'onboarding screen',
+  'landing page', 'home screen', 'settings page', 'profile page',
+  // Installation
+  'download', 'install', 'launch the app',
+  // Onboarding-specific
+  'onboard', 'onboarding', 'tutorial', 'walkthrough', 'product tour', 'in-app',
+  // Notifications & prompts
+  'push notification', 'in-app notification', 'pop-up', 'popup', 'tooltip', 'toast',
+  // Product models
+  'saas', 'freemium', 'free trial', 'trial period', 'subscription plan',
+  // User action phrases (specific enough to be digital)
+  'user lands on', 'user clicks', 'user taps', 'user sees', 'user enters',
+  'user opens the', 'user downloads', 'user signs up', 'user logs in',
+  // Dev/technical onboarding
+  'api key', 'oauth', 'sso', 'sdk', 'code snippet', 'embed',
 ]
 
 function looksLikeOnboardingFlow(text: string): boolean {
