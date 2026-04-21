@@ -61,6 +61,9 @@ export default function InputForm({ value, onChange, onSubmit, loading }: InputF
         }}
       >
         <textarea
+          id="onboarding-flow-input"
+          aria-label="Describe your onboarding flow"
+          aria-describedby="input-status input-privacy"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onFocus={() => setFocused(true)}
@@ -95,6 +98,9 @@ export default function InputForm({ value, onChange, onSubmit, loading }: InputF
           }}
         >
           <span
+            id="input-status"
+            role="status"
+            aria-live="polite"
             style={{
               fontSize: 12,
               fontWeight: 500,
@@ -104,7 +110,7 @@ export default function InputForm({ value, onChange, onSubmit, loading }: InputF
             }}
           >
             {isTooShort
-              ? 'Add more detail for a more complete analysis. At least 2 to 3 steps works best.'
+              ? 'A bit more detail will sharpen the analysis — 2 or 3 steps usually does it.'
               : count > 0
                 ? `${count} characters`
                 : ''}
@@ -112,6 +118,7 @@ export default function InputForm({ value, onChange, onSubmit, loading }: InputF
           <button
             onClick={onSubmit}
             disabled={!canSubmit}
+            aria-label={loading ? 'Analyzing your onboarding flow' : 'Analyze your onboarding flow'}
             style={{
               background: canSubmit ? '#1a6ff0' : 'rgba(0,0,0,0.10)',
               color: canSubmit ? '#ffffff' : '#5a5a7a',
@@ -133,9 +140,24 @@ export default function InputForm({ value, onChange, onSubmit, loading }: InputF
         </div>
       </div>
 
+      {/* Privacy disclosure — tells users what happens to their input */}
+      <p
+        id="input-privacy"
+        style={{
+          margin: '8px 4px 0',
+          fontSize: 12,
+          color: '#5a5a7a',
+          lineHeight: 1.5,
+        }}
+      >
+        Your input is sent to Anthropic's Claude API for analysis and isn't stored by Activation Lab.
+      </p>
+
       {/* Scope warning — shown below the input box, non-blocking */}
       {showScopeWarning && (
         <div
+          role="status"
+          aria-live="polite"
           style={{
             marginTop: 10,
             padding: '10px 14px',

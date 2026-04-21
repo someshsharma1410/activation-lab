@@ -101,6 +101,7 @@ export default function App() {
         {/* Activation metric — optional context field */}
         <div style={{ marginBottom: 12 }}>
           <label
+            htmlFor="activation-metric"
             style={{
               display: 'block',
               fontSize: 11,
@@ -111,16 +112,17 @@ export default function App() {
               marginBottom: 7,
             }}
           >
-            What does activation mean for your product?{' '}
+            When do users feel they've actually started using your product?{' '}
             <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0, opacity: 0.7 }}>
               optional
             </span>
           </label>
           <input
+            id="activation-metric"
             type="text"
             value={activationMetric}
             onChange={(e) => setActivationMetric(e.target.value)}
-            placeholder="e.g. first project created, day 1 retention, first purchase"
+            placeholder="e.g. first project created, first real use, first purchase"
             style={{
               width: '100%',
               padding: '11px 16px',
@@ -159,13 +161,14 @@ export default function App() {
               letterSpacing: '0.09em',
             }}
           >
-            New here? Try an example:
+            Click a sample to fill in the box below:
           </p>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {EXAMPLE_FLOWS.map((flow) => (
               <button
                 key={flow.label}
                 onClick={() => setFlowText(flow.text)}
+                aria-label={`Fill in sample ${flow.label} onboarding flow`}
                 style={{
                   background: '#ffffff',
                   border: '1px solid rgba(0,0,0,0.08)',
@@ -193,6 +196,7 @@ export default function App() {
                 }}
               >
                 <span
+                  aria-hidden="true"
                   style={{
                     fontSize: 9,
                     fontWeight: 700,

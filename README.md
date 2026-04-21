@@ -54,19 +54,19 @@ These are the calls I made as the PM on this, and why:
 
 - **Why input validation is a soft warning, not a hard block.** A B2B sales process isn't the target use case, but I'm not the arbiter of what a user wants to analyze. The tool warns and lets them proceed.
 
-## What v2 would address
+## What v2 addressed
 
-I ran the tool past five AI models before launch. They all approved. Then someone outside product management tried it, and within five minutes I had a different list:
+I ran the tool past five AI models before launch. They all approved. Then someone outside product management tried it, and within five minutes I had a different list. None of the AI reviewers had flagged any of it.
 
-- **Accessibility issues** on the input screen
-- **Jargon** that assumed product management vocabulary
-- **Example buttons** that confused rather than oriented
-- **A 50-character soft warning** that read as punitive instead of protective
-- **Missing privacy disclosure** on the input field
+AI reviews logic. First-time users review their experience. Those are two different audits — v2 is the one I'd skipped.
 
-None of the AI reviewers flagged any of this.
+Shipped in v2:
 
-AI reviews logic. First time users review their experience. Those are two different audits. v2 is the audit I skipped.
+- **Accessibility pass** — screen-reader-friendly labels on every form control, live regions on inline warnings, proper label-input associations
+- **Plain-English copy** — the activation question was rephrased from "What does activation mean for your product?" to "When do users feel they've actually started using your product?" and PM jargon was softened throughout
+- **Clearer example buttons** — heading changed from "New here? Try an example:" to "Click a sample to fill in the box below:" so users know what happens when they click
+- **Softer character-threshold warning** — invitational instead of prescriptive: "A bit more detail will sharpen the analysis — 2 or 3 steps usually does it."
+- **Privacy disclosure** — one line of microcopy under the input: *Your input is sent to Anthropic's Claude API for analysis and isn't stored by Activation Lab.*
 
 ## Built with
 
