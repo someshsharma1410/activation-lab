@@ -42,7 +42,7 @@ export default function App() {
   }
 
   return (
-    <div
+    <main
       style={{
         background: '#f5f4f1',
         minHeight: '100vh',
@@ -113,7 +113,7 @@ export default function App() {
             }}
           >
             When do users feel they've actually started using your product?{' '}
-            <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0, opacity: 0.7 }}>
+            <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0, color: '#6b6b85' }}>
               optional
             </span>
           </label>
@@ -272,14 +272,13 @@ export default function App() {
           style={{
             textAlign: 'center',
             fontSize: 12,
-            color: '#5a5a7a',
+            color: '#6b6b85',
             marginTop: 72,
-            opacity: 0.65,
           }}
         >
           A side project for exploring product activation frameworks
         </p>
       </div>
-    </div>
+    </main>
   )
 }

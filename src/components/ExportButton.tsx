@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import type { AnalysisResult } from '../types/analysis'
-import { exportToPDF } from '../lib/pdf-export'
 
 interface ExportButtonProps {
   result: AnalysisResult
@@ -59,9 +58,12 @@ export default function ExportButton({ result, flowText }: ExportButtonProps) {
     setTimeout(() => setCopied(false), 2200)
   }
 
-  function handlePDF() {
+  async function handlePDF() {
     setPdfLoading(true)
     try {
+      // Lazy-load jsPDF + html2canvas only when the user actually exports.
+      // Keeps ~153 KiB out of the initial bundle.
+      const { exportToPDF } = await import('../lib/pdf-export')
       exportToPDF(result, flowText)
     } finally {
       setTimeout(() => setPdfLoading(false), 800)
