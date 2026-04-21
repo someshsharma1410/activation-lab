@@ -50,6 +50,7 @@ function buildMarkdown(result: AnalysisResult, flowText: string): string {
 export default function ExportButton({ result, flowText }: ExportButtonProps) {
   const [copied, setCopied] = useState(false)
   const [pdfLoading, setPdfLoading] = useState(false)
+  const [pdfDone, setPdfDone] = useState(false)
   const [pdfError, setPdfError] = useState<string | null>(null)
 
   async function handleCopy() {
@@ -62,11 +63,17 @@ export default function ExportButton({ result, flowText }: ExportButtonProps) {
   async function handlePDF() {
     setPdfLoading(true)
     setPdfError(null)
+    setPdfDone(false)
+    console.log('[Activation Lab] Export brief clicked — loading pdf-export chunk')
     try {
       // Lazy-load jsPDF + html2canvas only when the user actually exports.
       // Keeps ~394 KiB out of the initial bundle.
       const mod = await import('../lib/pdf-export')
+      console.log('[Activation Lab] pdf-export chunk loaded, calling exportToPDF')
       mod.exportToPDF(result, flowText)
+      console.log('[Activation Lab] exportToPDF returned cleanly')
+      setPdfDone(true)
+      setTimeout(() => setPdfDone(false), 4000)
     } catch (err) {
       console.error('[Activation Lab] PDF export failed:', err)
       const msg = err instanceof Error ? err.message : 'Unknown error'
@@ -107,7 +114,11 @@ export default function ExportButton({ result, flowText }: ExportButtonProps) {
         onClick={handlePDF}
         disabled={pdfLoading}
         style={{
-          background: pdfLoading ? 'rgba(0,0,0,0.06)' : '#1a6ff0',
+          background: pdfLoading
+            ? 'rgba(0,0,0,0.06)'
+            : pdfDone
+              ? '#28a050'
+              : '#1a6ff0',
           border: 'none',
           borderRadius: 8,
           padding: '8px 16px',
@@ -116,13 +127,17 @@ export default function ExportButton({ result, flowText }: ExportButtonProps) {
           color: pdfLoading ? '#5a5a7a' : '#ffffff',
           cursor: pdfLoading ? 'not-allowed' : 'pointer',
           fontFamily: 'inherit',
-          transition: 'background 0.15s',
+          transition: 'background 0.2s',
           display: 'inline-flex',
           alignItems: 'center',
           gap: 7,
         }}
       >
-        {pdfLoading ? 'Generating...' : 'Export brief'}
+        {pdfLoading
+          ? 'Generating...'
+          : pdfDone
+            ? '✓ Downloaded activation-lab-brief.pdf'
+            : 'Export brief'}
       </button>
     </div>
     {pdfError && (
