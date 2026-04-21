@@ -50,6 +50,7 @@ function buildMarkdown(result: AnalysisResult, flowText: string): string {
 export default function ExportButton({ result, flowText }: ExportButtonProps) {
   const [copied, setCopied] = useState(false)
   const [pdfLoading, setPdfLoading] = useState(false)
+  const [pdfError, setPdfError] = useState<string | null>(null)
 
   async function handleCopy() {
     const md = buildMarkdown(result, flowText)
@@ -60,17 +61,25 @@ export default function ExportButton({ result, flowText }: ExportButtonProps) {
 
   async function handlePDF() {
     setPdfLoading(true)
+    setPdfError(null)
     try {
       // Lazy-load jsPDF + html2canvas only when the user actually exports.
-      // Keeps ~153 KiB out of the initial bundle.
-      const { exportToPDF } = await import('../lib/pdf-export')
-      exportToPDF(result, flowText)
+      // Keeps ~394 KiB out of the initial bundle.
+      const mod = await import('../lib/pdf-export')
+      mod.exportToPDF(result, flowText)
+    } catch (err) {
+      console.error('[Activation Lab] PDF export failed:', err)
+      const msg = err instanceof Error ? err.message : 'Unknown error'
+      setPdfError(msg)
+      // Auto-clear the error after a bit so the button is usable again
+      setTimeout(() => setPdfError(null), 8000)
     } finally {
-      setTimeout(() => setPdfLoading(false), 800)
+      setTimeout(() => setPdfLoading(false), 400)
     }
   }
 
   return (
+    <div>
     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
       <button
         onClick={handleCopy}
@@ -115,6 +124,24 @@ export default function ExportButton({ result, flowText }: ExportButtonProps) {
       >
         {pdfLoading ? 'Generating...' : 'Export brief'}
       </button>
+    </div>
+    {pdfError && (
+      <div
+        role="alert"
+        style={{
+          marginTop: 8,
+          padding: '8px 12px',
+          background: 'rgba(200,50,50,0.06)',
+          border: '1px solid rgba(200,50,50,0.25)',
+          borderRadius: 6,
+          color: '#8b2020',
+          fontSize: 12.5,
+          lineHeight: 1.5,
+        }}
+      >
+        <strong>PDF export failed:</strong> {pdfError}. Open the browser console for the full stack trace, or use <em>Copy as markdown</em> as a fallback.
+      </div>
+    )}
     </div>
   )
 }
