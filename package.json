@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "jspdf": "^4.2.1",
+    "partial-json": "^0.1.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

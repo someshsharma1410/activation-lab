@@ -25,7 +25,9 @@ export default function App() {
   const [flowText, setFlowText] = useState('')
   const [activationMetric, setActivationMetric] = useState('')
   const [result, setResult] = useState<AnalysisResult | null>(null)
+  const [partialResult, setPartialResult] = useState<Partial<AnalysisResult> | null>(null)
   const [isSampleResult, setIsSampleResult] = useState(false)
+  const [streaming, setStreaming] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -33,7 +35,9 @@ export default function App() {
     setLoading(true)
     setError(null)
     setResult(null)
+    setPartialResult(null)
     setIsSampleResult(false)
+    setStreaming(false)
     try {
       // If the user clicked an unmodified sample AND didn't set a custom
       // activation metric, serve the pre-computed analysis instantly
@@ -47,11 +51,20 @@ export default function App() {
         setIsSampleResult(true)
         return
       }
-      const data = await analyzeFlow(flowText, activationMetric.trim() || undefined)
+      // Live API call — stream the response so users see friction points
+      // appear one by one instead of staring at a 20-30s spinner.
+      setStreaming(true)
+      const data = await analyzeFlow(
+        flowText,
+        activationMetric.trim() || undefined,
+        (partial) => setPartialResult(partial),
+      )
       setResult(data)
+      setPartialResult(null)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong')
     } finally {
+      setStreaming(false)
       setLoading(false)
     }
   }
@@ -239,8 +252,8 @@ export default function App() {
           loading={loading}
         />
 
-        {/* Loading */}
-        {loading && (
+        {/* Loading — shown only until the stream delivers its first parseable partial */}
+        {loading && !partialResult && !result && (
           <div
             style={{
               display: 'flex',
@@ -251,7 +264,9 @@ export default function App() {
             }}
           >
             <div className="spinner" />
-            <span style={{ fontSize: 14, fontWeight: 400 }}>Analyzing your flow...</span>
+            <span style={{ fontSize: 14, fontWeight: 400 }}>
+              {streaming ? 'Claude is thinking through your flow...' : 'Analyzing your flow...'}
+            </span>
           </div>
         )}
 
@@ -273,13 +288,14 @@ export default function App() {
           </div>
         )}
 
-        {/* Results */}
-        {result && !loading && (
+        {/* Results — final result if we have one, otherwise the streaming partial */}
+        {(result || partialResult) && (
           <ResultsDisplay
-            result={result}
+            result={(result ?? partialResult) as AnalysisResult}
             flowText={flowText}
             activationMetric={activationMetric.trim() || undefined}
             isSample={isSampleResult}
+            streaming={streaming && !result}
           />
         )}
 
