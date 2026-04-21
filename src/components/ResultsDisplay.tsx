@@ -8,9 +8,10 @@ interface ResultsDisplayProps {
   result: AnalysisResult
   flowText: string
   activationMetric?: string
+  isSample?: boolean
 }
 
-export default function ResultsDisplay({ result, flowText, activationMetric }: ResultsDisplayProps) {
+export default function ResultsDisplay({ result, flowText, activationMetric, isSample }: ResultsDisplayProps) {
   const { summary, friction_points } = result
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
   const allExpanded = expandedIds.size === friction_points.length
@@ -34,6 +35,43 @@ export default function ResultsDisplay({ result, flowText, activationMetric }: R
 
   return (
     <div style={{ marginTop: 40 }}>
+      {/* Sample-analysis disclosure — only shown when serving pre-computed JSON */}
+      {isSample && (
+        <div
+          role="note"
+          style={{
+            background: 'rgba(26,111,240,0.06)',
+            border: '1px solid rgba(26,111,240,0.18)',
+            borderRadius: 8,
+            padding: '9px 14px',
+            marginBottom: 12,
+            display: 'flex',
+            gap: 10,
+            alignItems: 'center',
+            flexWrap: 'wrap',
+          }}
+        >
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: '#1a6ff0',
+              background: 'rgba(26,111,240,0.10)',
+              borderRadius: 4,
+              padding: '3px 7px',
+              flexShrink: 0,
+            }}
+          >
+            Sample
+          </span>
+          <span style={{ fontSize: 12.5, color: '#3a3a5a', lineHeight: 1.5 }}>
+            Saved analysis of the built-in sample, served instantly. Edit the text or paste your own flow to run a fresh analysis against the Claude API.
+          </span>
+        </div>
+      )}
+
       {/* Summary bar */}
       <div
         style={{

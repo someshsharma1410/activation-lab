@@ -2,6 +2,7 @@ import { useState } from 'react'
 import InputForm from './components/InputForm'
 import ResultsDisplay from './components/ResultsDisplay'
 import { analyzeFlow } from './lib/api'
+import { getSampleResult } from './lib/sample-results'
 import type { AnalysisResult } from './types/analysis'
 
 // Exact neutral descriptions from v2 spec Section 3.2.1
@@ -24,6 +25,7 @@ export default function App() {
   const [flowText, setFlowText] = useState('')
   const [activationMetric, setActivationMetric] = useState('')
   const [result, setResult] = useState<AnalysisResult | null>(null)
+  const [isSampleResult, setIsSampleResult] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -31,7 +33,20 @@ export default function App() {
     setLoading(true)
     setError(null)
     setResult(null)
+    setIsSampleResult(false)
     try {
+      // If the user clicked an unmodified sample AND didn't set a custom
+      // activation metric, serve the pre-computed analysis instantly
+      // instead of paying the 20–30s LLM generation cost. A short delay
+      // keeps the interaction legible ("something happened") vs a jarring
+      // instant state flip.
+      const precomputed = !activationMetric.trim() ? getSampleResult(flowText) : null
+      if (precomputed) {
+        await new Promise((r) => setTimeout(r, 600))
+        setResult(precomputed)
+        setIsSampleResult(true)
+        return
+      }
       const data = await analyzeFlow(flowText, activationMetric.trim() || undefined)
       setResult(data)
     } catch (e) {
@@ -264,6 +279,7 @@ export default function App() {
             result={result}
             flowText={flowText}
             activationMetric={activationMetric.trim() || undefined}
+            isSample={isSampleResult}
           />
         )}
 
