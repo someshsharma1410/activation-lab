@@ -54,6 +54,20 @@ These are the calls I made as the PM on this, and why:
 
 - **Why input validation is a soft warning, not a hard block.** A B2B sales process isn't the target use case, but I'm not the arbiter of what a user wants to analyze. The tool warns and lets them proceed.
 
+## What v2 would address
+
+I ran the tool past five AI models before launch. They all approved. Then someone outside product management tried it, and within five minutes I had a different list:
+
+- **Accessibility issues** on the input screen
+- **Jargon** that assumed product management vocabulary
+- **Example buttons** that confused rather than oriented
+- **A 50-character soft warning** that read as punitive instead of protective
+- **Missing privacy disclosure** on the input field
+
+None of the AI reviewers flagged any of this.
+
+AI reviews logic. First time users review their experience. Those are two different audits. v2 is the audit I skipped.
+
 ## Built with
 
 - **Anthropic Claude Sonnet 4** as the reasoning engine, accessed via the Claude API
