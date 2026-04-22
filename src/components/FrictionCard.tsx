@@ -172,7 +172,7 @@ export default function FrictionCard({ point, expanded, onToggle }: FrictionCard
               {point.title}
             </h3>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, flexWrap: 'wrap' as const, justifyContent: 'flex-end' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, flexWrap: 'wrap' as const, justifyContent: 'flex-end', marginLeft: 'auto' }}>
             <Tag color="#6c47d4" bg="rgba(108,71,212,0.09)">
               {FRAMEWORK_LABELS[point.framework]}
             </Tag>
