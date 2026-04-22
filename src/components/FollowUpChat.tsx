@@ -25,10 +25,23 @@ export default function FollowUpChat({ result, flowDescription }: FollowUpChatPr
   const [focused, setFocused] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
 
+  // Keep the viewport pinned to the bottom as the answer streams in,
+  // but use instant (behavior: 'auto') scroll instead of 'smooth'.
+  // Chat content updates 30-60x per second during streaming — chaining
+  // 'smooth' animations that target an ever-moving bottom caused the
+  // browser to fight itself, jittering hardest on landscape mobile
+  // where vertical space is tight. Instant scroll is imperceptible and
+  // matches how ChatGPT-style interfaces track streaming output.
+  // We still use 'smooth' when a new message is first inserted, because
+  // a single one-shot animation on bubble appearance feels polished.
+  const prevLen = useRef(messages.length)
   useEffect(() => {
-    if (messages.length > 0) {
-      bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }
+    if (messages.length === 0) return
+    const isNewMessage = messages.length !== prevLen.current
+    prevLen.current = messages.length
+    bottomRef.current?.scrollIntoView({
+      behavior: isNewMessage ? 'smooth' : 'auto',
+    })
   }, [messages])
 
   async function handleSend(question?: string) {
