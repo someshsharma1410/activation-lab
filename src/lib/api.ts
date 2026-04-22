@@ -39,7 +39,17 @@ export async function analyzeFlow(
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 2000,
-      system: SYSTEM_PROMPT,
+      // Cache the ~2.5k-token system prompt so repeat calls within a
+      // 5-minute window hit the 90% discount and shave ~1s off first-byte.
+      // The system field accepts a content-block array with cache_control
+      // (not just a string) to enable this.
+      system: [
+        {
+          type: 'text',
+          text: SYSTEM_PROMPT,
+          cache_control: { type: 'ephemeral' },
+        },
+      ],
       messages: [{ role: 'user', content: userMessage }],
       stream: true,
     }),
@@ -180,7 +190,18 @@ ${JSON.stringify(result, null, 2)}`
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 600,
-      system: systemPrompt,
+      // Cache the full system prompt (which carries the whole analysis
+      // JSON and flow text). The first follow-up question pays the cache
+      // write; messages #2, #3, ... in the same session get a 90% discount
+      // and faster first byte — the common case when a PM is interrogating
+      // their own analysis.
+      system: [
+        {
+          type: 'text',
+          text: systemPrompt,
+          cache_control: { type: 'ephemeral' },
+        },
+      ],
       messages,
     }),
   })
