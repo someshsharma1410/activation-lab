@@ -36,23 +36,51 @@ export default function FollowUpChat({ result, flowDescription }: FollowUpChatPr
     if (!text || loading) return
 
     const userMsg: Message = { role: 'user', content: text }
-    const newMessages = [...messages, userMsg]
-    setMessages(newMessages)
+    const historyAtSend = messages.map((m) => ({ role: m.role, content: m.content }))
+    setMessages((prev) => [...prev, userMsg])
     setInput('')
     setLoading(true)
 
+    // The stream closure accumulates the response. We insert the assistant
+    // bubble on the first chunk (so the typing dots vanish as soon as
+    // words arrive) and update its content on every subsequent chunk.
+    let accumulated = ''
+    let assistantInserted = false
+
     try {
-      const history = messages.map((m) => ({ role: m.role, content: m.content }))
-      const reply = await chatWithAnalysis(text, result, flowDescription, history)
-      setMessages([...newMessages, { role: 'assistant', content: reply }])
-    } catch (e) {
-      setMessages([
-        ...newMessages,
-        {
-          role: 'assistant',
-          content: e instanceof Error ? e.message : 'Something went wrong. Try again.',
+      await chatWithAnalysis(
+        text,
+        result,
+        flowDescription,
+        historyAtSend,
+        (delta) => {
+          accumulated += delta
+          if (!assistantInserted) {
+            assistantInserted = true
+            setLoading(false)
+            setMessages((prev) => [...prev, { role: 'assistant', content: accumulated }])
+          } else {
+            setMessages((prev) => {
+              if (prev.length === 0) return prev
+              const copy = prev.slice(0, -1)
+              copy.push({ role: 'assistant', content: accumulated })
+              return copy
+            })
+          }
         },
-      ])
+      )
+    } catch (e) {
+      const errText = e instanceof Error ? e.message : 'Something went wrong. Try again.'
+      if (!assistantInserted) {
+        setMessages((prev) => [...prev, { role: 'assistant', content: errText }])
+      } else {
+        setMessages((prev) => {
+          if (prev.length === 0) return prev
+          const copy = prev.slice(0, -1)
+          copy.push({ role: 'assistant', content: errText })
+          return copy
+        })
+      }
     } finally {
       setLoading(false)
     }

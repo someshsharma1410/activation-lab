@@ -151,16 +151,23 @@ function tryParsePartial(buffer: string): Partial<AnalysisResult> | undefined {
 }
 
 // ---------------------------------------------------------------------------
-// Follow-up chat — non-streaming for now. Answers are short (max 600 tokens)
-// and land in ~3-5s, which is fast enough that streaming adds complexity
-// without meaningful UX win.
+// Follow-up chat — also streamed. Answers are short (max 600 tokens) so the
+// UX win is smaller than on the main analysis, but consistency with the
+// main flow is worth it: users expect words to appear as they're generated
+// once they've seen that pattern on the first analysis.
 // ---------------------------------------------------------------------------
 
+/**
+ * Ask a follow-up question about an existing analysis. If onChunk is
+ * provided, the caller gets each text delta as it arrives for progressive
+ * rendering. Always returns the full accumulated text at the end.
+ */
 export async function chatWithAnalysis(
   question: string,
   result: AnalysisResult,
   flowDescription: string,
   history: { role: 'user' | 'assistant'; content: string }[],
+  onChunk?: (delta: string) => void,
 ): Promise<string> {
   const systemPrompt = `You are the same activation analyst who produced the analysis below. Answer follow up questions about the friction points, hypotheses, and recommended experiments.
 
@@ -203,6 +210,7 @@ ${JSON.stringify(result, null, 2)}`
         },
       ],
       messages,
+      stream: true,
     }),
   })
 
@@ -210,7 +218,33 @@ ${JSON.stringify(result, null, 2)}`
     const text = await response.text()
     throw new Error(`API error ${response.status}: ${text}`)
   }
+  if (!response.body) {
+    throw new Error('No response stream available')
+  }
 
-  const data = await response.json() as { content: { text: string }[] }
-  return data.content[0].text
+  const reader = response.body.getReader()
+  const decoder = new TextDecoder()
+  let textBuffer = ''
+  let sseBuffer = ''
+
+  try {
+    while (true) {
+      const { value, done } = await reader.read()
+      if (done) break
+      sseBuffer += decoder.decode(value, { stream: true })
+      const events = sseBuffer.split('\n\n')
+      sseBuffer = events.pop() ?? ''
+
+      for (const event of events) {
+        const delta = extractTextDelta(event)
+        if (delta === null) continue
+        textBuffer += delta
+        if (onChunk) onChunk(delta)
+      }
+    }
+  } finally {
+    reader.releaseLock()
+  }
+
+  return textBuffer
 }
