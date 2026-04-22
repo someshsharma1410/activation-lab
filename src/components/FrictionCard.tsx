@@ -126,17 +126,30 @@ export default function FrictionCard({ point, expanded, onToggle }: FrictionCard
           userSelect: 'none' as const,
         }}
       >
-        {/* Title row */}
+        {/* Title row — on narrow viewports the pills wrap below the title
+            instead of squeezing it into a one-word-per-line column. Title
+            block has a 220px flex-basis so it claims a readable width
+            before yielding, then the pill group drops to its own line. */}
         <div
           style={{
             display: 'flex',
             alignItems: 'flex-start',
             justifyContent: 'space-between',
-            gap: 12,
+            columnGap: 12,
+            rowGap: 8,
             marginBottom: 10,
+            flexWrap: 'wrap' as const,
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 9, minWidth: 0 }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 9,
+              flex: '1 1 220px',
+              minWidth: 0,
+            }}
+          >
             <div
               style={{
                 width: 8,
